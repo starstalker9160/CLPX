@@ -1,0 +1,9 @@
+{
+    "service": "clpx.services.homelab.ree",
+    "port": 6262,
+    "URLs": {
+        "register": "/new",
+        "copy": "/copy",
+        "websocket": "/ws"
+    }
+}

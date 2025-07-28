@@ -1,3 +1,4 @@
+from utils import *
 from flask import Flask
 from flask_sock import Sock
 import json, threading, time
@@ -5,15 +6,27 @@ import json, threading, time
 
 app = Flask(__name__)
 sock = Sock(app)
+cnfg = getConfig()
 
 
 @app.route('/')
 def home():
-    return "Hello from Flask on LAN!"
+    return "hello world"
 
-@sock.route('/ws')
+@app.route('/whoami')
+def whoami():
+    return cnfg["service"]
+
+@app.route(cnfg["URLs"]["register"])
+def register():
+    pass
+
+@app.route(cnfg["URLs"]["copy"])
+def copy():
+    pass
+
+@sock.route(cnfg["URLs"]["websocket"])
 def websocket(ws):
-    print('WebSocket connection established.')
     while True:
         data = ws.receive()
         if data is None:

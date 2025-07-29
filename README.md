@@ -1,7 +1,7 @@
 # CLPX (CLiPboard eXchange)
 
-> 📌 Note  
-> Currently still a WIP 🚧
+> ⚠️ Warning  
+> Do not use this version, use (this)[https://github.com/starstalker9160/CLPX/tree/main] instead
 
 A (soon to be) universal clipboard manager.
 

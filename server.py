@@ -16,10 +16,8 @@ def websocket(ws):
             if data is None:
                 break
 
-            # Log received message
             print(f"Received: {data}")
 
-            # Broadcast to all clients
             dead_clients = []
             for client in clients:
                 try:
@@ -28,7 +26,6 @@ def websocket(ws):
                 except:
                     dead_clients.append(client)
 
-            # Remove dead clients
             for client in dead_clients:
                 clients.discard(client)
     finally:

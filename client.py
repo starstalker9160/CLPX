@@ -10,7 +10,6 @@ async def listen(ws):
 async def send_input(ws):
     loop = asyncio.get_running_loop()
     while True:
-        # Run blocking input() in a thread
         user_input = await loop.run_in_executor(None, input, "Enter message: ")
         message = str(user_input).strip()
         await ws.send(message)

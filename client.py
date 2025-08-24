@@ -16,7 +16,7 @@ async def send_input(ws):
         print(f"Sent to server: {message}")
 
 async def main():
-    uri = "ws://localhost:6262/ws"
+    uri = "ws://192.168.1.3:6262/ws"
     async with websockets.connect(uri) as ws:
         await asyncio.gather(
             listen(ws),

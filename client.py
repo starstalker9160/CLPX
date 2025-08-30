@@ -44,6 +44,8 @@ async def send_input(ws):
     while True:
         user_input = await loop.run_in_executor(None, input, "Enter message: ")
         message = str(user_input).strip()
+        if message == "":
+            continue
         await ws.send(message)
         print(f"Sent to server: {message}")
 

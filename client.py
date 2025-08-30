@@ -64,3 +64,4 @@ if __name__ == '__main__':
         asyncio.run(main(f"ws://{IP}:{PORT}/ws"))
     except KeyboardInterrupt:
         print("Program interrupted by user")
+        sys.exit(1)

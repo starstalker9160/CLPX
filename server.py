@@ -33,15 +33,21 @@ def getLocalIP() -> str:
 def getNormalized(value: str) -> str: return value.replace('\r\n', '\n').replace('\r', '\n')
 
 def udpListener():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(('', 6969))
-    print("Listening for discovery")
-
     while True:
-        data, addr = sock.recvfrom(1024)
-        print(f"[UDP] Received: {data} from {addr}")
-        if data == "DISCOVER_clpx.services.homelab.ree".encode("utf-8"):
-            sock.sendto(f"{getLocalIP()}:{6262}/".encode(), addr)
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.bind(('', 6969))
+            print("Listening for discovery")
+
+            while True:
+                data, addr = sock.recvfrom(1024)
+                print(f"[UDP] Received: {data} from {addr}")
+                if data == "DISCOVER_clpx.services.homelab.ree".encode("utf-8"):
+                    sock.sendto(f"{getLocalIP()}:{6262}/".encode(), addr)
+        except Exception as e:
+            print("Fatal: udpListener encountered an error")
+            print(e)
+            sys.exit(1)
 
 @sock.route('/ws')
 def websocket(ws):
@@ -75,3 +81,4 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=6262)
     except KeyboardInterrupt:
         print("Program interrupted by user")
+        sys.exit(1)

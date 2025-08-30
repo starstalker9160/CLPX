@@ -1,11 +1,13 @@
 import sys, subprocess, socket, threading
+import tokens
 
 try:
     from flask import Flask
     from flask_sock import Sock
+    import mysql.connector
 except ImportError as e:
     missing = e.name
-    pkg = {"flask": "flask", "flask_sock": "flask-sock"}.get(missing, missing)
+    pkg = {"flask": "flask", "flask_sock": "flask-sock", "mysql": "mysql-connector-python"}.get(missing, missing)
     print(f"Missing module: {missing} (pip package: {pkg})")
     o = input(f"Install {pkg}? (y/n): ").strip().lower()
     if o == "y":
@@ -13,6 +15,33 @@ except ImportError as e:
         print(f"{pkg} installed. Please rerun the script.")
     else:
         sys.exit(1)
+
+
+def init_db():
+    try:
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password=tokens.fuckMySQL, # the password is a secret because i hate myself just enough to hide it...
+            database="clipboard_db"
+        )
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS clipboard_history (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                content TEXT NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+        return conn
+    except mysql.connector.Error as err:
+        print(f"MySQL Error: {err}")
+        sys.exit(1)
+
+db_conn = init_db()
+db_cursor = db_conn.cursor()
+
 
 app = Flask(__name__)
 sock = Sock(app)
@@ -35,15 +64,15 @@ def getNormalized(value: str) -> str: return value.replace('\r\n', '\n').replace
 def udpListener():
     while True:
         try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.bind(('', 6969))
+            sock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock_udp.bind(('', 6969))
             print("Listening for discovery")
 
             while True:
-                data, addr = sock.recvfrom(1024)
+                data, addr = sock_udp.recvfrom(1024)
                 print(f"[UDP] Received: {data} from {addr}")
                 if data == "DISCOVER_clpx.services.homelab.ree".encode("utf-8"):
-                    sock.sendto(f"{getLocalIP()}:{6262}/".encode(), addr)
+                    sock_udp.sendto(f"{getLocalIP()}:{6262}/".encode(), addr)
         except Exception as e:
             print("Fatal: udpListener encountered an error")
             print(e)
@@ -60,6 +89,14 @@ def websocket(ws):
                 break
 
             print(f"Received: {data}")
+
+            try:
+                # mind you, i have no idea what the fuck this does
+                # i read the documentation and when i ran the code, it didnt give me an error so die lit?
+                db_cursor.execute("INSERT INTO clipboard_history (content) VALUES (%s)", (data,))
+                db_conn.commit()
+            except mysql.connector.Error as err:
+                print(f"MySQL insert error: {err}")
 
             dead_clients = []
             for client in clients:

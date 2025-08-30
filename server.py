@@ -1,4 +1,4 @@
-import sys, subprocess
+import sys, subprocess, socket
 
 try:
     from flask import Flask
@@ -18,6 +18,30 @@ app = Flask(__name__)
 sock = Sock(app)
 
 clients = set()
+
+def getLocalIP() -> str:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
+def getNormalized(value: str) -> str: return value.replace('\r\n', '\n').replace('\r', '\n')
+
+def udpListener():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(('', 6969))
+    print("Listening for discovery")
+
+    while True:
+        data, addr = sock.recvfrom(1024)
+        print(f"[UDP] Received: {data} from {addr}")
+        if data == "DISCOVER_clpx.services.homelab.ree".encode("utf-8"):
+            sock.sendto(f"{getLocalIP()}:{6262}/".encode(), addr)
 
 @sock.route('/ws')
 def websocket(ws):

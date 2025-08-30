@@ -1,4 +1,4 @@
-import sys, subprocess, asyncio
+import sys, subprocess, asyncio, socket
 
 try:
     import websockets
@@ -13,6 +13,25 @@ except ImportError as e:
         print(f"{pkg} installed. Please rerun the script.")
     else:
         sys.exit(1)
+
+IP, PORT = None, None
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+sock.settimeout(5)
+
+print("Locating CLPX server")
+for i in range(3):
+    print(f"Attempt ({i + 1}/3)...")
+    try:
+        sock.sendto("DISCOVER_clpx.services.homelab.ree".encode("utf-8"), ('255.255.255.255', 6969))
+        data, addr = sock.recvfrom(1024)
+        print(f"Found server at {data.decode("utf-8")}")
+        IP, PORT = data.decode("utf-8").rstrip("/").split(":")
+        PORT = int(PORT)
+        break
+    except socket.timeout:
+        print("No response, retrying...")
 
 
 async def listen(ws):
@@ -37,6 +56,9 @@ async def main(uri: str):
 
 if __name__ == '__main__':
     try:
-        asyncio.run(main(f"ws://{input("ip: ")}:{input("port: ")}/ws"))
+        if not IP or not PORT:
+            print("Did not find a CLPX server.")
+            sys.exit(1)
+        asyncio.run(main(f"ws://{IP}:{PORT}/ws"))
     except KeyboardInterrupt:
         print("")

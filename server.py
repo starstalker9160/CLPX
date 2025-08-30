@@ -1,5 +1,18 @@
-from flask import Flask
-from flask_sock import Sock
+import sys, subprocess
+
+try:
+    from flask import Flask
+    from flask_sock import Sock
+except ImportError as e:
+    missing = e.name
+    pkg = {"flask": "flask", "flask_sock": "flask-sock"}.get(missing, missing)
+    print(f"Missing module: {missing} (pip package: {pkg})")
+    o = input(f"Install {pkg}? (y/n): ").strip().lower()
+    if o == "y":
+        subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
+        print(f"{pkg} installed. Please rerun the script.")
+    else:
+        sys.exit(1)
 
 app = Flask(__name__)
 sock = Sock(app)

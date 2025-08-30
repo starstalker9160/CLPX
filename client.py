@@ -1,6 +1,19 @@
-import asyncio
-import websockets
-import pyperclip
+import sys, subprocess, asyncio
+
+try:
+    import websockets
+    import pyperclip
+except ImportError as e:
+    missing = e.name
+    pkg = {"websockets": "websockets", "pyperclip": "pyperclip"}.get(missing, missing)
+    print(f"Missing module: {missing} (pip package: {pkg})")
+    o = input(f"Install {pkg}? (y/n): ").strip().lower()
+    if o == "y":
+        subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
+        print(f"{pkg} installed. Please rerun the script.")
+    else:
+        sys.exit(1)
+
 
 async def listen(ws):
     async for message in ws:
@@ -15,8 +28,7 @@ async def send_input(ws):
         await ws.send(message)
         print(f"Sent to server: {message}")
 
-async def main():
-    uri = "ws://192.168.1.3:6262/ws"
+async def main(uri: str):
     async with websockets.connect(uri) as ws:
         await asyncio.gather(
             listen(ws),
@@ -24,4 +36,7 @@ async def main():
         )
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main(f"ws://{input("ip: ")}:{input("port: ")}/ws"))
+    except KeyboardInterrupt:
+        print("")

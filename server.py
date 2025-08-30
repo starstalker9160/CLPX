@@ -1,4 +1,4 @@
-import sys, subprocess, socket
+import sys, subprocess, socket, threading
 
 try:
     from flask import Flask
@@ -70,4 +70,8 @@ def websocket(ws):
         print(f"Client disconnected: {ws}")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=6262)
+    try:
+        threading.Thread(target=udpListener, daemon=True).start()
+        app.run(host='0.0.0.0', port=6262)
+    except KeyboardInterrupt:
+        print("Program interrupted by user")

@@ -36,7 +36,7 @@ for i in range(3):
 
 async def listen(ws):
     async for message in ws:
-        print(f"Received from server: {message}")
+        print(f"\nReceived from server: {message}")
         pyperclip.copy(message)
 
 async def send_input(ws):
@@ -61,4 +61,4 @@ if __name__ == '__main__':
             sys.exit(1)
         asyncio.run(main(f"ws://{IP}:{PORT}/ws"))
     except KeyboardInterrupt:
-        print("")
+        print("Program interrupted by user")

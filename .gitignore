@@ -10,3 +10,6 @@ venv/
 local/
 
 .DS_Store
+
+~*
+*.docx

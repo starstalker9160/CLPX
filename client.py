@@ -14,6 +14,7 @@ except ImportError as e:
     else:
         sys.exit(1)
 
+
 IP, PORT = None, None
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -42,12 +43,12 @@ async def listen(ws):
 async def send_input(ws):
     loop = asyncio.get_running_loop()
     while True:
-        user_input = await loop.run_in_executor(None, input, "Enter message: ")
+        user_input = await loop.run_in_executor(None, input, "\nEnter message: ")
         message = str(user_input).strip()
         if message == "":
             continue
         await ws.send(message)
-        print(f"Sent to server: {message}")
+        print(f"\nSent to server: {message}")
 
 async def main(uri: str):
     async with websockets.connect(uri) as ws:
@@ -55,6 +56,7 @@ async def main(uri: str):
             listen(ws),
             send_input(ws)
         )
+
 
 if __name__ == '__main__':
     try:

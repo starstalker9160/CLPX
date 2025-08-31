@@ -6,7 +6,7 @@ try:
     from flask_sock import Sock
     import mysql.connector
 except ImportError as e:
-    missing = e.name
+    missing = getattr(e, "name", None) or str(e).split("'")[1]
     pkg = {"flask": "flask", "flask_sock": "flask-sock", "mysql": "mysql-connector-python"}.get(missing, missing)
     print(f"Missing module: {missing} (pip package: {pkg})")
     o = input(f"Install {pkg}? (y/n): ").strip().lower()
@@ -22,7 +22,7 @@ def init_db():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password=tokens.fuckMySQL, # the password is a secret because i hate myself just enough to hide it...
+            password=tokens.sqlServerPassphrase,
             database="clipboard_db"
         )
         cursor = conn.cursor()
@@ -91,9 +91,6 @@ def websocket(ws):
             print(f"Received: {data}")
 
             try:
-                # mind you, i have no idea what the fuck this does
-                # i read the documentation and im pretty sure this is how it works?
-                # all im saying is: when i ran the code, it didn't give me an error so die lit?
                 db_cursor.execute("INSERT INTO clipboard_history (content) VALUES (%s)", (data,))
                 db_conn.commit()
             except mysql.connector.Error as e:
@@ -112,6 +109,7 @@ def websocket(ws):
     finally:
         clients.discard(ws)
         print(f"Client disconnected: {ws}")
+
 
 if __name__ == '__main__':
     try:

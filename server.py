@@ -92,11 +92,12 @@ def websocket(ws):
 
             try:
                 # mind you, i have no idea what the fuck this does
-                # i read the documentation and when i ran the code, it didnt give me an error so die lit?
+                # i read the documentation and im pretty sure this is how it works?
+                # all im saying is: when i ran the code, it didn't give me an error so die lit?
                 db_cursor.execute("INSERT INTO clipboard_history (content) VALUES (%s)", (data,))
                 db_conn.commit()
-            except mysql.connector.Error as err:
-                print(f"MySQL insert error: {err}")
+            except mysql.connector.Error as e:
+                print(f"MySQL insert error: {e}")
 
             dead_clients = []
             for client in clients:

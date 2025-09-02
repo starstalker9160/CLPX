@@ -44,7 +44,7 @@ def register():
     # TODO:
     # please fix this shit or i will be sad :(
 
-    # this shit is obsolte,
+    # this shit is obsolete,
     # make this work with the new client object
     # need to do usergroup validation, authorization and shit
     # please for the love of all that is holy

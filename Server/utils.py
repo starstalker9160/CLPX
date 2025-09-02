@@ -33,7 +33,7 @@ def getNormalized(value: str) -> str: return value.replace('\r\n', '\n').replace
 
 def addUser(userData: dict) -> Client:
     if (
-        {""}
+        {"ip", "userGroup"} - set(userData.keys())
     ):
         return 400
     return Client(userData["ip"], userData["userGroup"])

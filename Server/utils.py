@@ -31,5 +31,9 @@ def getLocalIP() -> str:
 
 def getNormalized(value: str) -> str: return value.replace('\r\n', '\n').replace('\r', '\n')
 
-def addUser(userData) -> Client:
+def addUser(userData: dict) -> Client:
+    if (
+        {""}
+    ):
+        return 400
     return Client(userData["ip"], userData["userGroup"])

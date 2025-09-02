@@ -6,6 +6,7 @@
     "udpPort": 6969,
     "URLs": {
         "register": "/new",
+        "newUserGroup": "/new-user-group",
         "websocket": "/ws"
     }
 }

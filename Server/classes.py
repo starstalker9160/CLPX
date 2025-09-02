@@ -1,5 +1,5 @@
 from typing import Any
-
+import datetime as dt
 
 
 def log(msg: str, code: int = 0, exceptionType: type[BaseException] = Exception) -> None:
@@ -73,3 +73,11 @@ class ClipHist:
 
     def __repr__(self):
         return f"ClipHist({self._items!r})"
+
+
+class Client:
+    def __init__(self, ip, userGroup):
+        self.registeredAt = dt.datetime.now(dt.timezone.utc).timestamp()
+
+        self.ip = ip
+        self.userGroup = userGroup

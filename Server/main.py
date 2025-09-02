@@ -1,7 +1,7 @@
 from utils import *
 from classes import *
 from flask_sock import Sock
-import socket, threading, datetime as dt
+import socket, threading
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import BadRequest
 
@@ -15,17 +15,18 @@ clipHist = ClipHist(enableLimit=True, limit=50)
 
 
 def udpListener():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(('', cnfg["udpPort"]))
-    log("Listening for discovery")
-
     while True:
-        data, addr = sock.recvfrom(1024)
-        print(f"[UDP] Received: {data} from {addr}")
-        if data == cnfg["discoverMessage"].encode("utf-8"):
-            ip = getLocalIP()
-            response = f"{ip}:{cnfg["serverPort"]}".encode()
-            sock.sendto(response, addr)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(('', cnfg["udpPort"]))
+        log("Listening for discovery")
+
+        while True:
+            data, addr = sock.recvfrom(1024)
+            print(f"[UDP] Received: {data} from {addr}")
+            if data == cnfg["discoverMessage"].encode("utf-8"):
+                ip = getLocalIP()
+                response = f"{ip}:{cnfg["serverPort"]}".encode()
+                sock.sendto(response, addr)
 
 
 @app.route('/')
@@ -33,11 +34,21 @@ def home():
     return "hello world"
 
 @app.route('/whoami')
-def whoami():
-    return cnfg["service"]
+def whoami(): return cnfg["service"]
+
+@app.route(cnfg["URLs"]["newUserGroup"])
+def newUserGroup(): return "fuck you"
 
 @app.route(cnfg["URLs"]["register"], methods=["POST"])
 def register():
+    # TODO:
+    # please fix this shit or i will be sad :(
+
+    # this shit is obsolte,
+    # make this work with the new client object
+    # need to do usergroup validation, authorization and shit
+    # please for the love of all that is holy
+    return Exception("FUCK YOU")
     try:
         data = request.get_json()
     except BadRequest:

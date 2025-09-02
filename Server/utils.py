@@ -8,12 +8,15 @@ def getConfig() -> dict:
         cnfg = json.load(f)
     
     try:
-        if "service" not in cnfg or "serverPort" not in cnfg or "URLs" not in cnfg:
+        if (
+            {"service", "serverPort", "URLs"} - set(cnfg.keys())
+            or not isinstance(cnfg["URLs"], dict)
+            or {"register", "newUserGroup", "websocket"} - set(cnfg["URLs"].keys())
+        ):
             raise KeyError
         return cnfg
     except KeyError:
-        log("Invalid config.json", 3, KeyError)
-
+        log("Invalid config.json, missing required fields", 3, KeyError)
 
 def getLocalIP() -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -27,3 +30,6 @@ def getLocalIP() -> str:
     return IP
 
 def getNormalized(value: str) -> str: return value.replace('\r\n', '\n').replace('\r', '\n')
+
+def addUser(userData) -> Client:
+    return Client(userData["ip"], userData["userGroup"])

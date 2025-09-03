@@ -1,7 +1,7 @@
 from utils import *
 from classes import *
-from flask_sock import Sock
 import socket, threading
+from flask_sock import Sock
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import BadRequest
 
@@ -12,6 +12,8 @@ cnfg = getConfig()
 
 activeDevices = {}
 clipHist = ClipHist(enableLimit=True, limit=50)
+
+userGroups = []
 
 
 def udpListener():

@@ -34,7 +34,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(435, 573);
             Name = "ClipboardForm";
             Text = "ClipboardForm";
             Load += ClipboardForm_Load;

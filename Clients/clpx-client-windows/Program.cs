@@ -2,7 +2,7 @@ namespace clpx_client_windows {
     internal static class Program {
         private static NotifyIcon trayIcon;
         private static ContextMenuStrip trayMenu;
-        private static Form1 configForm;
+        private static ConfigForm configForm;
         private static ClipboardForm clipForm;
 
         [STAThread]
@@ -22,12 +22,18 @@ namespace clpx_client_windows {
                 Visible = true
             };
 
+            trayIcon.MouseUp += (sender, e) => {
+                if (e.Button == MouseButtons.Left) {
+                    trayMenu.Show(Control.MousePosition);
+                }
+            };
+
             Application.Run();
         }
 
         private static void OnOpenConfig(object sender, EventArgs e) {
             if (configForm == null || configForm.IsDisposed) {
-                configForm = new Form1();
+                configForm = new ConfigForm();
                 configForm.FormClosed += (s, args) => configForm = null;
                 configForm.Show();
             } else {

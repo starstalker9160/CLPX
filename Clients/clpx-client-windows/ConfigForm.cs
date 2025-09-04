@@ -1,6 +1,6 @@
 namespace clpx_client_windows {
-    public partial class Form1 : Form {
-        public Form1() {
+    public partial class ConfigForm : Form {
+        public ConfigForm() {
             InitializeComponent();
             this.Text = "clpx-client-windows Config";
         }

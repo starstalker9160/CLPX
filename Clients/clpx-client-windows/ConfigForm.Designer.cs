@@ -1,6 +1,6 @@
 ﻿namespace clpx_client_windows
 {
-    partial class Form1
+    partial class ConfigForm
     {
         /// <summary>
         ///  Required designer variable.

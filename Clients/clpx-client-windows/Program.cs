@@ -3,6 +3,7 @@ namespace clpx_client_windows {
         private static NotifyIcon trayIcon;
         private static ContextMenuStrip trayMenu;
         private static Form1 configForm;
+        private static ClipboardForm clipForm;
 
         [STAThread]
         static void Main() {
@@ -10,7 +11,8 @@ namespace clpx_client_windows {
             Application.SetCompatibleTextRenderingDefault(false);
 
             trayMenu = new ContextMenuStrip();
-            trayMenu.Items.Add("Open config", null, OnOpenConfig);
+            trayMenu.Items.Add("Open helper window", null, OnOpenConfig);
+            trayMenu.Items.Add("Show clipboard", null, OnOpenClipboard);
             trayMenu.Items.Add("Exit", null, OnExit);
 
             trayIcon = new NotifyIcon {
@@ -33,6 +35,22 @@ namespace clpx_client_windows {
 
                 configForm.BringToFront();
                 configForm.Activate();
+            }
+        }
+
+        private static void OnOpenClipboard(object sender, EventArgs e) {
+            if (clipForm == null || clipForm.IsDisposed)
+            {
+                clipForm = new ClipboardForm();
+                clipForm.FormClosed += (s, args) => clipForm = null;
+                clipForm.Show();
+            }
+            else
+            {
+                if (clipForm.WindowState == FormWindowState.Minimized) { clipForm.WindowState = FormWindowState.Normal; }
+
+                clipForm.BringToFront();
+                clipForm.Activate();
             }
         }
 

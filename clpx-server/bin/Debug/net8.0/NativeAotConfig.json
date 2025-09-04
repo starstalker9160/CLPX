@@ -1,0 +1,12 @@
+{
+    "runtimeOptions": {
+        "tfm": "net8.0",
+        "aot": true
+    },
+    "reflection": [
+        {
+            "type": "System.Text.Json.JsonSerializer",
+            "methods": "*"
+        }
+    ]
+}

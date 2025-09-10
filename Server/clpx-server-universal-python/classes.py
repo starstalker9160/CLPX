@@ -1,4 +1,5 @@
 import datetime as dt
+from __future__ import annotations
 
 
 def log(msg: str, code: int = 0, exceptionType: type[BaseException] = Exception) -> None:
@@ -75,11 +76,11 @@ class ClipHist:
 
 
 class Client:
-    def __init__(self, ip: str, userGroupID: UserGroup = None):
+    def __init__(self, ip: str, userGroup: UserGroup | None = None):
         self.registeredAt = dt.datetime.now(dt.timezone.utc).timestamp()
 
         self.ip = ip   # using this to identify each client uniquely, sorta a "client id"
-        self.userGroupID = userGroupID
+        self.userGroup = userGroup
 
     def __eq__(self, other) -> bool:
         if isinstance(other, self.__class__):
@@ -90,12 +91,12 @@ class Client:
     def __ne__(self, other) -> bool:
         return not self.__eq__(other)
 
-    def addedToUserGroup(self, userGroupID: int) -> None:
+    def addedToUserGroup(self, userGroupID: UserGroup) -> None:
         if not userGroupID:
-            self.userGroupID = userGroupID
+            self.userGroup = userGroupID
 
     def removedFromUserGroup(self) -> None:
-        self.userGroupID = None
+        self.userGroup = None
 
 
 class UserGroup:
@@ -117,10 +118,10 @@ class UserGroup:
         if clientObject in self.deadClients:
             self.deadClients.remove(clientObject)
         self.activeClients.append(clientObject)
-        clientObject.addedToUserGroup(self.id)
+        clientObject.addedToUserGroup(self)
 
     def removeClient(self, clientObject: Client) -> None:
         if clientObject in self.activeClients:
             self.activeClients.remove(clientObject)
-            clientObject.removedFromUserGroup(self.id)
+            clientObject.removedFromUserGroup()
             self.deadClients.append(clientObject)

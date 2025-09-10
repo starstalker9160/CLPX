@@ -1,4 +1,3 @@
-from typing import Any
 import datetime as dt
 
 
@@ -55,7 +54,7 @@ class ClipHist:
         self.enableLimit = enableLimit
         self.limit = limit
 
-    def add(self, value: str):
+    def add(self, value: str) -> None:
         if self._items and self._items[0].value["value"] == value:
             return
 
@@ -76,8 +75,52 @@ class ClipHist:
 
 
 class Client:
-    def __init__(self, ip, userGroup):
+    def __init__(self, ip: str, userGroupID: UserGroup = None):
         self.registeredAt = dt.datetime.now(dt.timezone.utc).timestamp()
 
-        self.ip = ip
-        self.userGroup = userGroup
+        self.ip = ip   # using this to identify each client uniquely, sorta a "client id"
+        self.userGroupID = userGroupID
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, self.__class__):
+            return self.ip == other.ip   # see what i mean? "client id"
+        else:
+            return False
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
+    def addedToUserGroup(self, userGroupID: int) -> None:
+        if not userGroupID:
+            self.userGroupID = userGroupID
+
+    def removedFromUserGroup(self) -> None:
+        self.userGroupID = None
+
+
+class UserGroup:
+    def __init__(self, userGroupID: int):
+        self.id = userGroupID
+        self.activeClients = []
+        self.deadClients = []
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, self.__class__):
+            return self.id == other.id
+        else:
+            return False
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
+    def addClient(self, clientObject: Client) -> None:
+        if clientObject in self.deadClients:
+            self.deadClients.remove(clientObject)
+        self.activeClients.append(clientObject)
+        clientObject.addedToUserGroup(self.id)
+
+    def removeClient(self, clientObject: Client) -> None:
+        if clientObject in self.activeClients:
+            self.activeClients.remove(clientObject)
+            clientObject.removedFromUserGroup(self.id)
+            self.deadClients.append(clientObject)

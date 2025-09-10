@@ -4,9 +4,8 @@ from platform import system as getOs
 
 
 def getConfig() -> dict:
-    with open('config.json', 'r') as f:
-        cnfg = json.load(f)
-    
+    cnfg = getDictFromJSON("config.json")
+
     try:
         if (
             {"service", "serverPort", "URLs"} - set(cnfg.keys())
@@ -21,10 +20,10 @@ def getConfig() -> dict:
 def getLocalIP() -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        s.connect(('10.255.255.255', 1))
+        s.connect(("10.255.255.255", 1))
         IP = s.getsockname()[0]
     except Exception:
-        IP = '127.0.0.1'
+        IP = "127.0.0.1"
     finally:
         s.close()
     return IP
@@ -37,3 +36,7 @@ def addUser(userData: dict) -> Client:
     ):
         return 400
     return Client(userData["ip"], userData["userGroup"])
+
+def getDictFromJSON(path: str) -> dict:
+    with open(path, 'r') as f:
+        return dict(json.load(f))

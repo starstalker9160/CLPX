@@ -43,14 +43,6 @@ def newUserGroup(): return "fuck you"
 
 @app.route(cnfg["URLs"]["register"], methods=["POST"])
 def register():
-    # TODO:
-    # please fix this shit or i will be sad :(
-
-    # this shit is obsolete,
-    # make this work with the new client object
-    # need to do usergroup validation, authorization and shit
-    # please for the love of all that is holy
-    return Exception("FUCK YOU")
     try:
         data = request.get_json()
     except BadRequest:
@@ -65,7 +57,7 @@ def register():
         return jsonify({"status": "error", "message": "Missing fields"}), 400
 
     if data["passwrd"] != "topSecretPassword":
-        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+        return jsonify({"status": "error", "message": "Incorrect credentials"}), 401
 
     ip = data["ip"]
 
@@ -80,8 +72,21 @@ def register():
 @sock.route(cnfg["URLs"]["websocket"])
 def websocket(ws):
     while True:
-        data = ws.receive()
-        print(data)
+        request = ws.receive()
+        try:
+            data = request.get_json()
+        except BadRequest:
+            return jsonify({"status": "error", "message": "Invalid JSON format"}), 400
+        
+        if (
+            not data
+            or {"metadata", "data"} - set(data.keys())
+            or not isinstance(data["metadata"], dict)
+            or {"ip", "line-ending-style", "usergroup-ID", "type"} - set(data["metadata"].keys())
+        ):
+            return jsonify({"status": "error", "message": "Missing fields"}), 400
+
+        print(json.dumps(data, indent=4))
 
 
 if __name__ == '__main__':

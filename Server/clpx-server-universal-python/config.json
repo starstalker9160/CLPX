@@ -1,0 +1,12 @@
+{
+    "service": "clpx.services.homelab.ree",
+    "discoverMessage": "DISCOVER_clpx.services.homelab.ree",
+    "maxDiscoverRetries": 3,
+    "serverPort": 6262,
+    "udpPort": 6969,
+    "URLs": {
+        "register": "/new",
+        "newUserGroup": "/new-user-group",
+        "websocket": "/ws"
+    }
+}

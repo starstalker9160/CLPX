@@ -114,6 +114,16 @@ class Client:
 
     def __ne__(self, other) -> bool:
         return not self.__eq__(other)
+    
+    def __repr__(self) -> str:
+        registered_dt = dt.datetime.fromtimestamp(self.registeredAt, tz=dt.timezone.utc)
+        return (
+            f"{self.__class__.__name__}("
+            f"ip={self.ip!r}, "
+            f"userGroup={self.userGroup!r}, "
+            f"registeredAt={registered_dt.isoformat()}"
+            f")"
+        )
 
     def addedToUserGroup(self, userGroupID: UserGroup) -> None:
         if not userGroupID:
@@ -137,6 +147,14 @@ class UserGroup:
 
     def __ne__(self, other) -> bool:
         return not self.__eq__(other)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id={self.id}, "
+            f"activeClients={len(self.activeClients)}, "
+            f"deadClients={len(self.deadClients)})"
+        )
 
     def addClient(self, clientObject: Client) -> None:
         if clientObject in self.deadClients:

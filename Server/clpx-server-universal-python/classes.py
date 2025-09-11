@@ -28,6 +28,30 @@ def log(msg: str, code: int = 0, exceptionType: type[BaseException] = Exception)
         print(formatted_msg)
 
 
+def isOfSchema(data: dict, schema: dict) -> bool:
+    if not isinstance(data, dict):
+        return False
+
+    if len(data) != len(schema):
+        return False
+
+    for key in schema:
+        if key not in data:
+            return False
+
+        expected_type = schema[key]
+        value = data[key]
+
+        if isinstance(expected_type, dict):
+            if not validate_schema(value, expected_type):   # schema is pretty shallow, this is negligible in terms of time complexity, still O(n)
+                return False
+        else:
+            if not isinstance(value, expected_type):
+                return False
+
+    return True
+
+
 
 class ClipItem:
     def __init__(self, value: str, idempotencyKey: str):

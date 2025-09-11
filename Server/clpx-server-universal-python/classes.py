@@ -43,7 +43,7 @@ def isOfSchema(data: dict, schema: dict) -> bool:
         value = data[key]
 
         if isinstance(expected_type, dict):
-            if not validate_schema(value, expected_type):   # schema is pretty shallow, this is negligible in terms of time complexity, still O(n)
+            if not isOfSchema(value, expected_type):   # schema is pretty shallow, this is negligible in terms of time complexity, still O(n)
                 return False
         else:
             if not isinstance(value, expected_type):

@@ -48,12 +48,7 @@ def register():
     except BadRequest:
         return jsonify({"status": "error", "message": "Invalid JSON format"}), 400
 
-    if (
-        not data
-        or {"deets", "passwrd"} - set(data.keys())
-        or not isinstance(data["deets"], dict)
-        or {"os", "ip", "port"} - set(data["deets"].keys())
-    ):
+    if not isOfSchema(data, Schemas.newDevice()):
         return jsonify({"status": "error", "message": "Missing fields"}), 400
 
     if data["passwrd"] != "topSecretPassword":
@@ -77,13 +72,8 @@ def websocket(ws):
             data = request.get_json()
         except BadRequest:
             return jsonify({"status": "error", "message": "Invalid JSON format"}), 400
-        
-        if (
-            not data
-            or {"metadata", "data"} - set(data.keys())
-            or not isinstance(data["metadata"], dict)
-            or {"ip", "line-ending-style", "usergroup-ID", "type"} - set(data["metadata"].keys())
-        ):
+
+        if not isOfSchema(data, Schemas.clipboardAction()):
             return jsonify({"status": "error", "message": "Missing fields"}), 400
 
         print(json.dumps(data, indent=4))

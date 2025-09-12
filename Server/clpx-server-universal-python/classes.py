@@ -54,6 +54,9 @@ def isOfSchema(data: dict, schema: dict) -> bool:
 
 
 class Schemas:
+    # TODO:
+
+    # authorization, duh
     @property
     def clipboardAction():
         return {
@@ -66,6 +69,20 @@ class Schemas:
                 "total-chunks": int
             },
             "data": str
+        }
+
+    @property
+    def newDevice():
+        return {
+            "idempotency-key": str,
+            "ip": str,
+            "usergroup-ID": str
+        }
+    
+    @property
+    def newUserGroup():
+        return {
+            "idempotency-key": str   # please rethink this
         }
 
 

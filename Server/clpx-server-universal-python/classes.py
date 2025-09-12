@@ -53,6 +53,22 @@ def isOfSchema(data: dict, schema: dict) -> bool:
 
 
 
+class Schemas:
+    @property
+    def clipboardAction():
+        return {
+            "metadata": {
+                "ip": str,
+                "line-ending-style": str,
+                "usergroup-ID": int,
+                "type": str,
+                "current-chunk": int,
+                "total-chunks": int
+            },
+            "data": str
+        }
+
+
 class ClipItem:
     def __init__(self, value: str, idempotencyKey: str):
         if not idempotencyKey:

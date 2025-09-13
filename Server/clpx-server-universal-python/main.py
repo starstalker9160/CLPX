@@ -76,6 +76,10 @@ def websocket(ws):
         if not isOfSchema(data, Schemas.clipboardAction()):
             return jsonify({"status": "error", "message": "Missing fields"}), 400
 
+        # TODO
+        # check for chunks and idempotency
+        clipHist.add(ClipItem(data["data"]))
+
         print(json.dumps(data, indent=4))
 
 

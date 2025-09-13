@@ -1,5 +1,5 @@
-import datetime as dt
 from __future__ import annotations
+import datetime as dt
 
 
 def log(msg: str, code: int = 0, exceptionType: type[BaseException] = Exception) -> None:
@@ -57,9 +57,23 @@ class Schemas:
     # TODO:
 
     # authorization, duh
-    @property
+    def config():
+        return {
+            "service": str,
+            "discoverMessage": str,
+            "maxDiscoverRetries": int,
+            "serverPort": int,
+            "udpPort": int,
+            "URLs": {
+                "register": str,
+                "newUserGroup": str,
+                "websocket": str
+            }
+        }
+
     def clipboardAction():
         return {
+            "idempotency-key": str,
             "metadata": {
                 "ip": str,
                 "line-ending-style": str,
@@ -71,15 +85,13 @@ class Schemas:
             "data": str
         }
 
-    @property
     def newDevice():
         return {
             "idempotency-key": str,
             "ip": str,
             "usergroup-ID": str
         }
-    
-    @property
+
     def newUserGroup():
         return {
             "idempotency-key": str   # please rethink this

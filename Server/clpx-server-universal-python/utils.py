@@ -7,11 +7,7 @@ def getConfig() -> dict:
     cnfg = getDictFromJSON("config.json")
 
     try:
-        if (
-            {"service", "serverPort", "URLs"} - set(cnfg.keys())
-            or not isinstance(cnfg["URLs"], dict)
-            or {"register", "newUserGroup", "websocket"} - set(cnfg["URLs"].keys())
-        ):
+        if not isOfSchema(cnfg, Schemas.config()):
             raise KeyError
         return cnfg
     except KeyError:
@@ -31,9 +27,7 @@ def getLocalIP() -> str:
 def getNormalized(value: str) -> str: return value.replace('\r\n', '\n').replace('\r', '\n')
 
 def addUser(userData: dict) -> Client:
-    if (
-        {"ip", "userGroup"} - set(userData.keys())
-    ):
+    if not isOfSchema(userData, Schemas.newDevice()):
         return 400
     return Client(userData["ip"], userData["userGroup"])
 

@@ -12,3 +12,5 @@ venv/
 tokens.py
 
 .github/
+
+test.py

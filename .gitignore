@@ -1,17 +1,2 @@
-**/builds
-*.spec
-*.pyc
-
-.vscode/
-venv/
-
-**/__pycache__/**/*
-
-local/
-
-.DS_Store
-
-~*
-*.docx
-
-tokens.py
+# Created by venv; see https://docs.python.org/3/library/venv.html
+*

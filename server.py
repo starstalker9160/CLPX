@@ -1,5 +1,4 @@
-import sys, subprocess, socket, threading
-import tokens
+import sys, subprocess, socket, threading, tokens
 
 try:
     from flask import Flask
@@ -58,8 +57,6 @@ def getLocalIP() -> str:
     finally:
         s.close()
     return IP
-
-def getNormalized(value: str) -> str: return value.replace('\r\n', '\n').replace('\r', '\n')
 
 def udpListener():
     while True:

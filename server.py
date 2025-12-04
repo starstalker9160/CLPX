@@ -1,4 +1,4 @@
-import sys, subprocess, socket, threading, tokens
+import sys, subprocess, socket, threading, utils
 
 try:
     from flask import Flask
@@ -13,6 +13,7 @@ except ImportError as e:
         subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
         print(f"{pkg} installed. Please rerun the script.")
     else:
+        utils.closeLogFile()
         sys.exit(1)
 
 db_conn = None
@@ -25,7 +26,7 @@ def init_db():
         db_conn = msc.connect(
             host="127.0.0.1",
             user="clipuser",
-            password=tokens.sqlServerPassphrase,
+            password=utils.sqlServerPassphrase,
             database="clipboard_db"
         )
         db_cursor = db_conn.cursor()
@@ -37,12 +38,15 @@ def init_db():
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        print("[  OK  ] Created table")
+        utils.log("Started server")
         db_conn.commit()
     except Exception as e:
+        utils.log(e, 3)
         print(e)
     except msc.Error as err:
+        utils.log(err, 3)
         print(f"MySQL Error: {err}")
+        utils.closeLogFile()
         sys.exit(1)
 
 init_db()
@@ -68,6 +72,7 @@ def udpListener():
         try:
             sock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock_udp.bind(('', 6969))
+            utils.log("Setup UDP listener")
             print("Listening for discovery")
 
             while True:
@@ -76,13 +81,15 @@ def udpListener():
                 if data == "DISCOVER_clpx.services.homelab.ree".encode("utf-8"):
                     sock_udp.sendto(f"{getLocalIP()}:{6262}/".encode(), addr)
         except Exception as e:
-            print("Fatal: udpListener encountered an error")
+            utils.log(e, 3)
             print(e)
+            utils.closeLogFile()
             sys.exit(1)
 
 @sock.route('/ws')
 def websocket(ws):
     clients.add(ws)
+    utils.log(f"Client connected: {ws}")
     print(f"Client connected: {ws}")
     try:
         while True:
@@ -96,12 +103,14 @@ def websocket(ws):
                 db_cursor.execute("INSERT INTO clipboard_history (content) VALUES (%s)", (data,))
                 db_conn.commit()
             except msc.Error as e:
-                print(f"MySQL insert error: {e}")
+                utils.log(e, 3)
+                print(f"MySQL error: {e}")
 
             dead_clients = []
             for client in clients:
                 try:
                     client.send(data)
+                    utils.log("Copy function performed")
                     print(f"Sent: {data.encode('utf-8')}")
                 except:
                     dead_clients.append(client)
@@ -110,6 +119,7 @@ def websocket(ws):
                 clients.discard(client)
     finally:
         clients.discard(ws)
+        utils.log(f"Client disconnected: {ws}")
         print(f"Client disconnected: {ws}")
 
 
@@ -118,5 +128,7 @@ if __name__ == '__main__':
         threading.Thread(target=udpListener, daemon=True).start()
         app.run(host='0.0.0.0', port=6262)
     except KeyboardInterrupt:
+        utils.log("Program interrupted by user", 3)
         print("Program interrupted by user")
+        utils.closeLogFile()
         sys.exit(1)

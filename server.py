@@ -3,7 +3,7 @@ import sys, subprocess, socket, threading, tokens
 try:
     from flask import Flask
     from flask_sock import Sock
-    import mysql.connector
+    import mysql.connector as msc
 except ImportError as e:
     missing = getattr(e, "name", None) or str(e).split("'")[1]
     pkg = {"flask": "flask", "flask_sock": "flask-sock", "mysql": "mysql-connector-python"}.get(missing, missing)
@@ -15,32 +15,37 @@ except ImportError as e:
     else:
         sys.exit(1)
 
+db_conn = None
+db_cursor = None
 
 def init_db():
+    global db_conn
+    global db_cursor
     try:
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
+        db_conn = msc.connect(
+            host="127.0.0.1",
+            user="clipuser",
             password=tokens.sqlServerPassphrase,
             database="clipboard_db"
         )
-        cursor = conn.cursor()
-        cursor.execute("""
+        db_cursor = db_conn.cursor()
+        db_cursor.execute("create database if not exists clipboard_db")
+        db_cursor.execute("""
             CREATE TABLE IF NOT EXISTS clipboard_history (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 content TEXT NOT NULL,
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        conn.commit()
-        return conn
-    except mysql.connector.Error as err:
+        print("[  OK  ] Created table")
+        db_conn.commit()
+    except Exception as e:
+        print(e)
+    except msc.Error as err:
         print(f"MySQL Error: {err}")
         sys.exit(1)
 
-db_conn = init_db()
-db_cursor = db_conn.cursor()
-
+init_db()
 
 app = Flask(__name__)
 sock = Sock(app)
@@ -90,7 +95,7 @@ def websocket(ws):
             try:
                 db_cursor.execute("INSERT INTO clipboard_history (content) VALUES (%s)", (data,))
                 db_conn.commit()
-            except mysql.connector.Error as e:
+            except msc.Error as e:
                 print(f"MySQL insert error: {e}")
 
             dead_clients = []

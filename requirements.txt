@@ -2,4 +2,4 @@ flask
 flask_sock
 pyperclip
 websockets
-mysql-connector-python
+mysql-connector-python==8.4.0
